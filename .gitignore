@@ -10,3 +10,19 @@
 
 # Built Visual Studio Code Extensions
 *.vsix
+
+# Maven
+target/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+
