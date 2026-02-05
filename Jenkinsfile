@@ -9,7 +9,7 @@ pipeline{
     environment {
         APP_NAME = "complete-prodcution-e2e-pipeline"
         RELEASE = "1.0.0"
-        DOCKER_USER = "dmancloud"
+        DOCKER_USER = "adajesus"
         DOCKER_PASS = 'dockerhub'
         IMAGE_NAME = "${DOCKER_USER}" + "/" + "${APP_NAME}"
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
@@ -112,15 +112,21 @@ pipeline{
     }
 
     post {
-        failure {
-            emailext body: '''${SCRIPT, template="groovy-html.template"}''', 
-                    subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - Failed", 
-                    mimeType: 'text/html',to: "dmistry@yourhostdirect.com"
-            }
-         success {
-               emailext body: '''${SCRIPT, template="groovy-html.template"}''', 
-                    subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - Successful", 
-                    mimeType: 'text/html',to: "dmistry@yourhostdirect.com"
-          }      
+    always {
+        // Wrap in catchError so email failures don't fail the build
+        catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+            emailext(
+                to: 'gracechieke@outlook.com',        
+                subject: "Jenkins Build: ${currentBuild.fullDisplayName}",
+                body: """
+                    Build Status: ${currentBuild.currentResult}
+                    Project: ${env.JOB_NAME}
+                    Build Number: ${env.BUILD_NUMBER}
+                    Console Output: ${env.BUILD_URL}console
+                """,
+                mimeType: 'text/plain'
+            )
+        }
     }
+}
 }
